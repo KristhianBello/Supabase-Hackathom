@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Entregas Académicas
 
-## Getting Started
+Plataforma Next.js + Supabase para entregar, revisar y calificar tareas con
+autorización Zero Trust mediante Row Level Security (RLS).
 
-First, run the development server:
+## Desarrollo local
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+1. Instala las dependencias:
+
+   ```bash
+   npm install
+   ```
+
+2. Copia `.env.local.example` a `.env.local` y agrega la URL y la clave
+   publicable del proyecto Supabase.
+
+3. Inicia la aplicación:
+
+   ```bash
+   npm run dev
+   ```
+
+## Supabase
+
+El esquema reproducible está en `supabase/migrations/`. Incluye:
+
+- Perfiles con roles `admin`, `profesor` y `estudiante`.
+- Materias, inscripciones, tareas, entregas y calificaciones.
+- RLS para aislar cursos, entregas, notas y auditoría.
+- Bucket privado `entregas-alumnos` para archivos PDF de hasta 10 MB.
+- Rutas de Storage con formato
+  `{tarea_id}/{estudiante_id}/{archivo.pdf}`.
+- Auditoría de mutaciones aceptadas en `audit_logs`.
+
+Los tipos de TypeScript en `src/lib/database.types.ts` se generan desde el
+esquema remoto.
+
+## Preparar usuarios
+
+Crea los usuarios desde Supabase Auth. Cada usuario nuevo empieza como
+`estudiante`. Para preparar el primer administrador o un profesor, cambia su
+rol desde el SQL Editor o una operación administrativa confiable:
+
+```sql
+update public.profiles
+set rol = 'admin'
+where id = '<uuid-del-usuario>';
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Nunca expongas una clave secreta o `service_role` en variables
+`NEXT_PUBLIC_*`.

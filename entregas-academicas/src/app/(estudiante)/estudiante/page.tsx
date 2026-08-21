@@ -1,7 +1,7 @@
 'use client'
 
 // Persona 2 — dashboard del estudiante: sus propias entregas y notas.
-// TODO: query real contra `submissions` + `calificaciones` filtrado por
+// TODO: query real contra `entregas` + `calificaciones` filtrado por
 // el usuario autenticado (RLS ya restringe esto a sus propias filas).
 
 export default function EstudianteDashboardPage() {

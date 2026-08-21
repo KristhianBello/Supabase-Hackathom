@@ -2,7 +2,7 @@
 
 // Persona 3 — dashboard del profesor: sus materias y las entregas recibidas.
 // TODO: listar `materias` donde profesor_id = usuario actual, y por materia
-// las `submissions` con link de descarga del PDF (Storage) + formulario para
+// las `entregas` con link de descarga del PDF (Storage) + formulario para
 // INSERT/UPDATE en `calificaciones`. RLS ya impide tocar materias ajenas.
 
 export default function ProfesorDashboardPage() {

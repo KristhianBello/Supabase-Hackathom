@@ -1,0 +1,2 @@
+-- Los usuarios se crean con Supabase Auth para que el trigger genere profiles.
+-- Agregar datos de demostracion aqui cuando existan sus UUID reales.

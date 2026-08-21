@@ -1,9 +1,9 @@
 'use client'
 
 // Persona 2 — subir un PDF a una materia inscrita.
-// TODO: seleccionar materia (de las inscripciones del estudiante), subir a
-// Storage bucket `entregas-alumnos` en la ruta {materia_id}/{student_id}/archivo.pdf,
-// luego INSERT en `submissions`. RLS rechaza el INSERT si ya pasó fecha_limite
+// TODO: seleccionar tarea (de las materias inscritas), subir a Storage bucket
+// `entregas-alumnos` en {tarea_id}/{estudiante_id}/archivo.pdf y luego INSERT
+// en `entregas`. RLS rechaza el INSERT si ya pasó fecha_limite
 // o si no está inscrito — solo hace falta mostrar el error, no prevalidarlo.
 
 export default function EntregarPage() {
