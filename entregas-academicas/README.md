@@ -59,8 +59,13 @@ npm run seed:demo-users
 Después de aplicar `supabase/seed.sql`, comprueba todos los accesos y sus roles:
 
 ```bash
+npm run seed:demo-files
 npm run check:demo-logins
 ```
+
+El primer comando crea los PDF ficticios referenciados por las entregas en el
+bucket privado. Se autentica como el administrador de demostración y no
+requiere una clave secreta.
 
 Estos usuarios y datos son solo para desarrollo o demostraciones. Nunca
 expongas una clave secreta o `service_role` en variables `NEXT_PUBLIC_*`, ni
