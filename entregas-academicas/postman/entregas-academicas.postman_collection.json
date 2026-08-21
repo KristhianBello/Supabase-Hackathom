@@ -1,15 +1,15 @@
 {
   "info": {
     "name": "Entregas Académicas — Demo de acceso denegado",
-    "description": "Persona 3. Requests para el guion de la demo en vivo: probar con el JWT de Estudiante A que RLS y las políticas de Storage bloquean acceso a datos ajenos.",
+    "description": "Persona 3. Requests para el guion de la demo en vivo: probar con el JWT de Estudiante A que RLS y las políticas de Storage bloquean acceso a datos ajenos. Ruta de Storage real: {tarea_id}/{estudiante_id}/{archivo}.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "supabase_url", "value": "" },
-    { "key": "supabase_anon_key", "value": "" },
+    { "key": "supabase_publishable_key", "value": "" },
     { "key": "jwt_estudiante_a", "value": "" },
-    { "key": "materia_id", "value": "" },
-    { "key": "student_b_id", "value": "" },
+    { "key": "tarea_id", "value": "" },
+    { "key": "estudiante_b_id", "value": "" },
     { "key": "calificacion_id_ajena", "value": "" },
     { "key": "jwt_admin", "value": "" }
   ],
@@ -19,7 +19,7 @@
       "request": {
         "method": "GET",
         "header": [
-          { "key": "apikey", "value": "{{supabase_anon_key}}" },
+          { "key": "apikey", "value": "{{supabase_publishable_key}}" },
           { "key": "Authorization", "value": "Bearer {{jwt_estudiante_a}}" }
         ],
         "url": {
@@ -29,7 +29,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"prefix\": \"{{materia_id}}/{{student_b_id}}\"\n}",
+          "raw": "{\n  \"prefix\": \"{{tarea_id}}/{{estudiante_b_id}}\"\n}",
           "options": { "raw": { "language": "json" } }
         }
       }
@@ -39,7 +39,7 @@
       "request": {
         "method": "PATCH",
         "header": [
-          { "key": "apikey", "value": "{{supabase_anon_key}}" },
+          { "key": "apikey", "value": "{{supabase_publishable_key}}" },
           { "key": "Authorization", "value": "Bearer {{jwt_estudiante_a}}" },
           { "key": "Content-Type", "value": "application/json" },
           { "key": "Prefer", "value": "return=representation" }
@@ -62,7 +62,7 @@
       "request": {
         "method": "GET",
         "header": [
-          { "key": "apikey", "value": "{{supabase_anon_key}}" },
+          { "key": "apikey", "value": "{{supabase_publishable_key}}" },
           { "key": "Authorization", "value": "Bearer {{jwt_admin}}" }
         ],
         "url": {

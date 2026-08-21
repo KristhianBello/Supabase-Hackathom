@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 import type { Database } from '@/lib/database.types'
 
-const protectedPrefixes = ['/estudiante', '/profesor', '/admin']
+const protectedPrefixes = ['/dashboard']
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
