@@ -1,0 +1,80 @@
+{
+  "info": {
+    "name": "Entregas Académicas — Demo de acceso denegado",
+    "description": "Persona 3. Requests para el guion de la demo en vivo: probar con el JWT de Estudiante A que RLS y las políticas de Storage bloquean acceso a datos ajenos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "supabase_url", "value": "" },
+    { "key": "supabase_anon_key", "value": "" },
+    { "key": "jwt_estudiante_a", "value": "" },
+    { "key": "materia_id", "value": "" },
+    { "key": "student_b_id", "value": "" },
+    { "key": "calificacion_id_ajena", "value": "" },
+    { "key": "jwt_admin", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "2. Listar carpeta de Estudiante B en Storage (debe fallar/vacío)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "apikey", "value": "{{supabase_anon_key}}" },
+          { "key": "Authorization", "value": "Bearer {{jwt_estudiante_a}}" }
+        ],
+        "url": {
+          "raw": "{{supabase_url}}/storage/v1/object/list/entregas-alumnos",
+          "host": ["{{supabase_url}}"],
+          "path": ["storage", "v1", "object", "list", "entregas-alumnos"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prefix\": \"{{materia_id}}/{{student_b_id}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        }
+      }
+    },
+    {
+      "name": "3. UPDATE calificaciones ajena (debe afectar 0 filas)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "apikey", "value": "{{supabase_anon_key}}" },
+          { "key": "Authorization", "value": "Bearer {{jwt_estudiante_a}}" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Prefer", "value": "return=representation" }
+        ],
+        "url": {
+          "raw": "{{supabase_url}}/rest/v1/calificaciones?id=eq.{{calificacion_id_ajena}}",
+          "host": ["{{supabase_url}}"],
+          "path": ["rest", "v1", "calificaciones"],
+          "query": [{ "key": "id", "value": "eq.{{calificacion_id_ajena}}" }]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nota\": 100\n}",
+          "options": { "raw": { "language": "json" } }
+        }
+      }
+    },
+    {
+      "name": "4. (Admin) Ver audit_logs completos",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "apikey", "value": "{{supabase_anon_key}}" },
+          { "key": "Authorization", "value": "Bearer {{jwt_admin}}" }
+        ],
+        "url": {
+          "raw": "{{supabase_url}}/rest/v1/audit_logs?select=*&order=created_at.desc",
+          "host": ["{{supabase_url}}"],
+          "path": ["rest", "v1", "audit_logs"],
+          "query": [
+            { "key": "select", "value": "*" },
+            { "key": "order", "value": "created_at.desc" }
+          ]
+        }
+      }
+    }
+  ]
+}
