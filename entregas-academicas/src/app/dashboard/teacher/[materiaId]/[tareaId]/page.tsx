@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth'
 import { Stamp } from '@/components/Stamp'
+import { ClockIcon, DownloadIcon } from '@/components/icons'
 import { calificar } from './actions'
 
 export default async function TareaEntregasPage({
@@ -72,16 +73,17 @@ export default async function TareaEntregasPage({
         ← {tarea.materias?.nombre ?? 'Materia'}
       </Link>
 
-      <h1 className="mt-2 font-display text-2xl font-semibold text-ink">{tarea.titulo}</h1>
-      <p className="mt-1 text-sm text-ink-muted">
+      <h1 className="mt-2 font-display text-3xl font-semibold text-ink">{tarea.titulo}</h1>
+      <p className="mt-1.5 flex items-center gap-1.5 text-sm text-ink-muted">
+        <ClockIcon />
         Fecha límite: {new Date(tarea.fecha_limite).toLocaleString()}
       </p>
 
-      <ul className="mt-6 space-y-4">
+      <ul className="mt-8 space-y-4">
         {filas.map((entrega) => (
           <li
             key={entrega.id}
-            className="rounded-lg border border-arena border-l-[5px] border-l-cacao bg-paper-raised p-5 shadow-sm"
+            className="paper-shadow rounded-lg border border-arena border-l-[5px] border-l-cacao bg-paper-raised p-5"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -101,8 +103,9 @@ export default async function TareaEntregasPage({
               <a
                 href={entrega.pdfUrl}
                 target="_blank"
-                className="mt-2 inline-block text-sm text-pacifico underline decoration-pacifico/40 underline-offset-2 hover:text-pacifico-dark"
+                className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-pacifico decoration-pacifico/40 underline-offset-2 hover:text-pacifico-dark hover:underline"
               >
+                <DownloadIcon />
                 Descargar PDF
               </a>
             ) : (

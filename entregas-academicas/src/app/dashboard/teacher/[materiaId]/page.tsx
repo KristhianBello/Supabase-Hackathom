@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth'
 import { Stamp } from '@/components/Stamp'
+import { ClockIcon } from '@/components/icons'
 
 export default async function MateriaTareasPage({
   params,
@@ -28,33 +29,45 @@ export default async function MateriaTareasPage({
     .order('fecha_limite')
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-10">
+    <main className="mx-auto max-w-4xl px-6 py-12">
       <Link href="/dashboard/teacher" className="text-sm text-ink-muted hover:text-cacao">
         ← Mis materias
       </Link>
 
-      <h1 className="mt-2 font-display text-2xl font-semibold text-ink">{materia.nombre}</h1>
-      <p className="mt-1 text-sm text-ink-muted">Tareas de esta materia.</p>
+      <h1 className="mt-2 font-display text-3xl font-semibold text-ink">{materia.nombre}</h1>
+      <p className="mt-1.5 text-sm text-ink-muted">
+        Tareas ordenadas por fecha límite, como asientos en un libro.
+      </p>
 
-      <ul className="mt-6 space-y-3">
+      {/* Orden cronológica real (fecha_limite) — la línea de tiempo encierra
+          esa información, no la decora. */}
+      <ol className="relative mt-8 border-l-2 border-arena pl-8">
         {tareas?.map((tarea) => {
           const vencida = new Date(tarea.fecha_limite) < new Date()
           return (
-            <li key={tarea.id}>
+            <li key={tarea.id} className="relative mb-4 last:mb-0">
+              <span
+                className={`absolute -left-[41px] mt-6 h-4 w-4 rounded-full border-2 border-paper ${
+                  vencida ? 'bg-ink-muted' : 'bg-musgo'
+                }`}
+              />
               <Link
                 href={`/dashboard/teacher/${materiaId}/${tarea.id}`}
-                className="flex items-center justify-between rounded-lg border border-arena border-l-[5px] border-l-cacao bg-paper-raised p-5 shadow-sm transition-shadow hover:shadow-md"
+                className="paper-shadow flex items-center justify-between rounded-lg border border-arena bg-paper-raised p-5 transition-transform hover:-translate-y-0.5"
               >
                 <span className="font-display font-medium text-ink">{tarea.titulo}</span>
                 <span className="flex items-center gap-3 text-sm text-ink-muted">
-                  <span className="font-mono text-xs">{new Date(tarea.fecha_limite).toLocaleString()}</span>
+                  <span className="flex items-center gap-1.5 font-mono text-xs">
+                    <ClockIcon />
+                    {new Date(tarea.fecha_limite).toLocaleString()}
+                  </span>
                   <Stamp tone={vencida ? 'ink' : 'musgo'}>{vencida ? 'Cerrada' : 'Abierta'}</Stamp>
                 </span>
               </Link>
             </li>
           )
         })}
-      </ul>
+      </ol>
 
       {tareas?.length === 0 && (
         <p className="mt-6 rounded-lg border border-dashed border-arena p-6 text-center text-sm text-ink-muted">

@@ -29,8 +29,8 @@ export default async function AdminAuditLogsPage() {
       <p className="font-mono text-[11px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
         Libro de auditoría
       </p>
-      <h1 className="mt-1 font-display text-2xl font-semibold text-ink">Audit logs</h1>
-      <p className="mt-1 text-sm text-ink-muted">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Audit logs</h1>
+      <p className="mt-1.5 text-sm text-ink-muted">
         Últimos {logs?.length ?? 0} eventos de <code className="font-mono">entregas</code> y{' '}
         <code className="font-mono">calificaciones</code>.
       </p>
@@ -41,10 +41,10 @@ export default async function AdminAuditLogsPage() {
         </p>
       )}
 
-      <div className="mt-6 overflow-x-auto rounded-lg border border-arena bg-paper-raised shadow-sm">
+      <div className="paper-shadow mt-8 overflow-x-auto rounded-lg border border-arena bg-paper-raised">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-arena text-ink-muted">
+            <tr className="border-b-2 border-arena text-ink-muted">
               <th className="px-4 py-3 font-mono text-xs font-semibold tracking-wide uppercase">Fecha</th>
               <th className="px-4 py-3 font-mono text-xs font-semibold tracking-wide uppercase">Actor</th>
               <th className="px-4 py-3 font-mono text-xs font-semibold tracking-wide uppercase">Tabla</th>
@@ -54,7 +54,7 @@ export default async function AdminAuditLogsPage() {
           </thead>
           <tbody>
             {logs?.map((log) => (
-              <tr key={log.id} className="border-b border-arena-soft last:border-0">
+              <tr key={log.id} className="border-b border-arena-soft odd:bg-arena-soft/40 last:border-0">
                 <td className="px-4 py-3 font-mono text-xs text-ink-muted">
                   {new Date(log.created_at).toLocaleString()}
                 </td>

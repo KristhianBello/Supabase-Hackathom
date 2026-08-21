@@ -8,28 +8,54 @@ export default async function LoginPage({
   searchParams: Promise<{ error?: string }>
 }) {
   const { error } = await searchParams
+  const folio = new Date().toLocaleDateString('es-EC', { year: 'numeric', month: '2-digit', day: '2-digit' })
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-paper px-6 py-12">
-      <div className="w-full max-w-sm">
-        <div className="mb-6 flex items-center gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-[1.5px] border-cacao font-display text-sm font-semibold text-cacao">
-            EA
-          </span>
-          <div>
+    <main className="relative flex min-h-screen items-center overflow-hidden px-6 py-16 lg:px-16">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 -right-32 h-[30rem] w-[30rem] shrink-0 lg:top-1/2 lg:-right-24 lg:-translate-y-1/2"
+      >
+        <div className="h-full w-full rounded-full border-[3px] border-cacao/[0.08]" />
+        <div className="absolute inset-8 rounded-full border border-dashed border-cacao/[0.12]" />
+        <div className="absolute inset-16 rounded-full border border-dashed border-toquilla/[0.16]" />
+      </div>
+
+      <div className="relative mx-auto grid w-full max-w-5xl gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-[1.5px] border-cacao font-display text-xs font-semibold text-cacao">
+              EA
+            </span>
             <p className="font-mono text-[11px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
-              Registro académico
+              Entregas académicas · Manabí
             </p>
-            <p className="text-sm text-ink-muted">Entregas Académicas</p>
+          </div>
+
+          <h1 className="mt-6 font-display text-4xl leading-[1.05] font-semibold text-ink sm:text-5xl">
+            Verificado
+            <br />
+            fila por fila.
+          </h1>
+          <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink-muted">
+            Estudiantes entregan, profesores califican, y cada acceso —autorizado o no— queda
+            asentado en el libro de auditoría.
+          </p>
+
+          <div className="mt-10 hidden items-center gap-3 lg:flex">
+            <span className="h-px w-10 bg-arena" />
+            <span className="font-mono text-xs tracking-wide text-ink-muted uppercase">
+              Folio {folio}
+            </span>
           </div>
         </div>
 
         <form
           action={login}
-          className="rounded-lg border border-arena border-l-[6px] border-l-cacao bg-paper-raised p-8 shadow-sm"
+          className="paper-shadow rounded-lg border border-arena border-l-[6px] border-l-cacao bg-paper-raised p-8"
         >
-          <h1 className="font-display text-2xl font-semibold text-ink">Iniciar sesión</h1>
-          <p className="mt-1.5 text-sm text-ink-muted">Cada acceso queda registrado.</p>
+          <h2 className="font-display text-xl font-semibold text-ink">Iniciar sesión</h2>
+          <p className="mt-1.5 text-sm text-ink-muted">Usá tu correo institucional.</p>
 
           <div className="mt-6 space-y-4">
             <label className="block">
