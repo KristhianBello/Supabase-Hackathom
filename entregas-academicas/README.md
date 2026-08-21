@@ -35,6 +35,17 @@ El esquema reproducible está en `supabase/migrations/`. Incluye:
 Los tipos de TypeScript en `src/lib/database.types.ts` se generan desde el
 esquema remoto.
 
+## Verificar la conexión
+
+Con `.env.local` configurado, ejecuta:
+
+```bash
+npm run check:supabase
+```
+
+La aplicación también expone `GET /api/health`. Una conexión correcta devuelve
+HTTP `200` con `status: "ok"`; el endpoint no expone claves ni datos académicos.
+
 ## Preparar usuarios
 
 Crea los usuarios desde Supabase Auth. Cada usuario nuevo empieza como
