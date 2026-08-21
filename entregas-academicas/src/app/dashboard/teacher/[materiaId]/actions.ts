@@ -40,36 +40,49 @@ export async function crearTarea(
     return { error: 'Elegí una fecha límite futura y válida.' }
   }
 
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
-  if (!user) return { error: 'Tu sesión venció. Volvé a iniciar sesión.' }
+    if (!user) return { error: 'Tu sesión venció. Volvé a iniciar sesión.' }
 
-  // Esta comprobación mejora el mensaje de la interfaz. La política RLS de
-  // `tareas` sigue siendo la autoridad que impide crear tareas ajenas.
-  const { data: materia } = await supabase
-    .from('materias')
-    .select('id')
-    .eq('id', materiaId)
-    .eq('profesor_id', user.id)
-    .maybeSingle()
+    // Esta comprobación mejora el mensaje de la interfaz. La política RLS de
+    // `tareas` sigue siendo la autoridad que impide crear tareas ajenas.
+    const { data: materia, error: materiaError } = await supabase
+      .from('materias')
+      .select('id')
+      .eq('id', materiaId)
+      .eq('profesor_id', user.id)
+      .maybeSingle()
 
-  if (!materia) {
-    return { error: 'No tenés autorización para asignar una tarea en esta materia.' }
+    if (materiaError) {
+      console.error('crearTarea: no se pudo validar la materia', materiaError)
+      return { error: 'No se pudo validar la materia. Intentá nuevamente.' }
+    }
+
+    if (!materia) {
+      return { error: 'No tenés autorización para asignar una tarea en esta materia.' }
+    }
+
+    const { error } = await supabase.from('tareas').insert({
+      materia_id: materiaId,
+      titulo,
+      descripcion: descripcion || null,
+      fecha_limite: fechaLimite.toISOString(),
+    })
+
+    if (error) {
+      console.error('crearTarea: no se pudo insertar la tarea', error)
+      return { error: `No se pudo crear la tarea: ${error.message}` }
+    }
+
+    revalidatePath(`/dashboard/teacher/${materiaId}`)
+    revalidatePath('/dashboard/teacher')
+    return { success: 'La tarea se asignó a los estudiantes inscritos.' }
+  } catch (error) {
+    console.error('crearTarea: error inesperado', error)
+    return { error: 'Ocurrió un error inesperado. Intentá nuevamente.' }
   }
-
-  const { error } = await supabase.from('tareas').insert({
-    materia_id: materiaId,
-    titulo,
-    descripcion: descripcion || null,
-    fecha_limite: fechaLimite.toISOString(),
-  })
-
-  if (error) return { error: `No se pudo crear la tarea: ${error.message}` }
-
-  revalidatePath(`/dashboard/teacher/${materiaId}`)
-  revalidatePath('/dashboard/teacher')
-  return { success: 'La tarea se asignó a los estudiantes inscritos.' }
 }
