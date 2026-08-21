@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { dashboardPathForRole } from '@/lib/auth'
 
 export async function login(formData: FormData) {
   const email = formData.get('email') as string
@@ -21,12 +22,5 @@ export async function login(formData: FormData) {
     .eq('id', data.user.id)
     .single()
 
-  const destino =
-    profile?.rol === 'profesor'
-      ? '/dashboard/teacher'
-      : profile?.rol === 'admin'
-        ? '/dashboard/admin'
-        : '/dashboard/student'
-
-  redirect(destino)
+  redirect(dashboardPathForRole(profile?.rol))
 }
