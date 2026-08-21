@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Stamp } from '@/components/Stamp'
+import { StudentNav } from '@/components/StudentNav'
 import { logout } from './actions'
 
 const ROL_LABEL: Record<string, string> = {
@@ -60,6 +61,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </div>
         <div className="letterhead-bar h-[3px]" />
       </header>
+
+      {profile?.rol === 'estudiante' && <StudentNav />}
 
       {children}
     </div>

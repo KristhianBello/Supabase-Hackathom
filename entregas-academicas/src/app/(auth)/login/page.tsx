@@ -1,6 +1,7 @@
 // Persona 2
 
 import { login } from './actions'
+import { HandWrittenTitle } from '@/components/ui/hand-writing-text'
 
 export default async function LoginPage({
   searchParams,
@@ -14,11 +15,18 @@ export default async function LoginPage({
     <main className="relative flex min-h-screen items-center overflow-hidden px-6 py-16 lg:px-16">
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-32 -right-32 h-[30rem] w-[30rem] shrink-0 lg:top-1/2 lg:-right-24 lg:-translate-y-1/2"
+        className="pointer-events-none absolute -top-32 -right-32 hidden h-[30rem] w-[30rem] shrink-0 lg:top-1/2 lg:-right-24 lg:block lg:-translate-y-1/2"
       >
         <div className="h-full w-full rounded-full border-[3px] border-cacao/[0.08]" />
-        <div className="absolute inset-8 rounded-full border border-dashed border-cacao/[0.12]" />
         <div className="absolute inset-16 rounded-full border border-dashed border-toquilla/[0.16]" />
+        <HandWrittenTitle
+          title="Entregas"
+          subtitle="académicas"
+          className="absolute inset-8 flex items-center justify-center"
+          strokeClassName="text-cacao/60"
+          titleClassName="font-display text-2xl font-semibold tracking-tight text-cacao md:text-3xl"
+          subtitleClassName="font-mono text-xs tracking-[0.14em] text-cacao/70 uppercase md:text-sm"
+        />
       </div>
 
       <div className="relative mx-auto grid w-full max-w-5xl gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">

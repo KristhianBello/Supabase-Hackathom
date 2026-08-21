@@ -76,7 +76,7 @@ export default async function TareaEntregasPage({
       <h1 className="mt-2 font-display text-3xl font-semibold text-ink">{tarea.titulo}</h1>
       <p className="mt-1.5 flex items-center gap-1.5 text-sm text-ink-muted">
         <ClockIcon />
-        Fecha límite: {new Date(tarea.fecha_limite).toLocaleString()}
+        Fecha límite: {new Date(tarea.fecha_limite).toLocaleString('es-EC')}
       </p>
 
       <ul className="mt-8 space-y-4">
@@ -90,7 +90,9 @@ export default async function TareaEntregasPage({
                 <p className="font-display font-medium text-ink">{entrega.nombreEstudiante}</p>
                 <p className="text-sm text-ink-muted">
                   {entrega.archivo_nombre} · entregado el{' '}
-                  <span className="font-mono">{new Date(entrega.entregada_at).toLocaleString()}</span>
+                  <span className="font-mono">
+                    {new Date(entrega.entregada_at).toLocaleString('es-EC')}
+                  </span>
                 </p>
               </div>
 

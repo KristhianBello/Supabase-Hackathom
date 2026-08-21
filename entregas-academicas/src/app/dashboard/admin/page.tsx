@@ -56,7 +56,7 @@ export default async function AdminAuditLogsPage() {
             {logs?.map((log) => (
               <tr key={log.id} className="border-b border-arena-soft odd:bg-arena-soft/40 last:border-0">
                 <td className="px-4 py-3 font-mono text-xs text-ink-muted">
-                  {new Date(log.created_at).toLocaleString()}
+                  {new Date(log.created_at).toLocaleString('es-EC')}
                 </td>
                 <td className="px-4 py-3 text-ink">
                   {perfiles?.find((p) => p.id === log.actor_id)?.nombre_completo ?? log.actor_id ?? '—'}

@@ -62,7 +62,7 @@ export default async function MateriaTareasPage({
                 <span className="flex items-center gap-3 text-sm text-ink-muted">
                   <span className="flex items-center gap-1.5 font-mono text-xs">
                     <ClockIcon />
-                    {new Date(tarea.fecha_limite).toLocaleString()}
+                    {new Date(tarea.fecha_limite).toLocaleString('es-EC')}
                   </span>
                   <Stamp tone={vencida ? 'ink' : 'musgo'}>{vencida ? 'Cerrada' : 'Abierta'}</Stamp>
                 </span>
