@@ -27,6 +27,8 @@ const SELLOS: Record<EstadoTarea, { texto: string; tone: StampTone }> = {
   calificada: { texto: 'Calificada', tone: 'musgo' },
 }
 
+const COURSE_COVERS = ['bg-cacao', 'bg-pacifico', 'bg-toquilla'] as const
+
 function resumen(tareas: TareaVM[]): string {
   const conteo: Record<string, number> = { pendiente: 0, entregada: 0, calificada: 0, vencida: 0 }
   for (const t of tareas) {
@@ -127,14 +129,29 @@ function TarjetaTarea({ tarea, pdfUrl }: { tarea: TareaVM; pdfUrl: string | null
   )
 }
 
-export default async function StudentDashboardPage() {
+export default async function StudentDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ materia?: string }>
+}) {
+  const { materia: materiaParam } = await searchParams
   const { supabase } = await requireRole('estudiante')
   const { tareas, error } = await fetchTareas(supabase)
+  const { data: materiasData } = await supabase
+    .from('materias')
+    .select('id, nombre')
+    .order('nombre')
+
+  const materias = (materiasData ?? []).map((materia) => materia.nombre)
+  const materiaSeleccionada = materiaParam && materias.includes(materiaParam) ? materiaParam : null
+  const tareasFiltradas = materiaSeleccionada
+    ? (tareas ?? []).filter((tarea) => tarea.materia === materiaSeleccionada)
+    : []
 
   // URLs firmadas generadas en servidor (la policy de Storage solo deja
   // firmar archivos dentro de la carpeta del propio estudiante).
   const filas = await Promise.all(
-    (tareas ?? []).map(async (tarea) => {
+    tareasFiltradas.map(async (tarea) => {
       if (!tarea.entrega) return { tarea, pdfUrl: null }
       const { data } = await supabase.storage
         .from('entregas-alumnos')
@@ -144,34 +161,91 @@ export default async function StudentDashboardPage() {
   )
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
-      <p className="font-mono text-[11px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
-        Libro de entregas
-      </p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Mis entregas</h1>
-      {tareas && tareas.length > 0 && (
-        <p className="mt-1.5 text-sm text-ink-muted tabular-nums">{resumen(tareas)}</p>
+    <main className="mx-auto max-w-5xl px-6 py-12">
+      <section id="resumen">
+        <p className="font-mono text-[11px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
+          Área personal
+        </p>
+        <h1 className="mt-1 font-display text-3xl font-semibold text-ink">
+          {materiaSeleccionada ?? 'Mis cursos'}
+        </h1>
+        {materiaSeleccionada && tareasFiltradas.length > 0 && (
+          <p className="mt-1.5 text-sm text-ink-muted tabular-nums">{resumen(tareasFiltradas)}</p>
+        )}
+      </section>
+
+      {materias.length > 0 && (
+        <section id="materias" aria-labelledby="materias-heading" className="mt-8">
+          <p className="font-mono text-[11px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
+            Vista general de cursos
+          </p>
+          <h2 id="materias-heading" className="mt-1 font-display text-xl font-semibold text-ink">
+            Cursos inscritos
+          </h2>
+          <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {materias.map((materia, index) => {
+              const total = tareas?.filter((tarea) => tarea.materia === materia).length ?? 0
+              const completadas =
+                tareas?.filter(
+                  (tarea) =>
+                    tarea.materia === materia &&
+                    ['entregada', 'cerrada', 'calificada'].includes(estadoTarea(tarea)),
+                ).length ?? 0
+              const activa = materia === materiaSeleccionada
+
+              return (
+                <Link
+                  key={materia}
+                  href={`/dashboard/student?materia=${encodeURIComponent(materia)}`}
+                  aria-current={activa ? 'page' : undefined}
+                  className="group paper-shadow overflow-hidden rounded-lg border border-arena bg-paper-raised transition-[border-color,transform] duration-150 hover:-translate-y-0.5 hover:border-pacifico focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pacifico active:scale-[0.99]"
+                >
+                  <span className={`flex h-24 items-center justify-center ${activa ? 'bg-pacifico' : COURSE_COVERS[index % COURSE_COVERS.length]}`}>
+                    <span className="flex size-12 items-center justify-center rounded-full border border-paper-raised/60 font-display text-xl font-semibold text-paper-raised">
+                      {materia.charAt(0).toUpperCase()}
+                    </span>
+                  </span>
+                  <span className="block p-4">
+                    <span className="block min-h-12 font-display text-base font-semibold leading-snug text-ink group-hover:text-pacifico [text-wrap:balance]">
+                      {materia}
+                    </span>
+                    <span className="mt-3 flex items-center justify-between border-t border-arena pt-3 text-xs text-ink-muted">
+                      <span>{total} tarea{total === 1 ? '' : 's'}</span>
+                      <span>{completadas}/{total} entregadas</span>
+                    </span>
+                  </span>
+                </Link>
+              )
+            })}
+          </div>
+        </section>
       )}
 
-      {error ? (
-        <div className="paper-shadow mt-8 rounded-lg border border-arena bg-paper-raised p-6 text-center">
-          <p className="text-sm text-ink">No se pudieron cargar tus tareas.</p>
-          <p className="mt-1 font-mono text-xs text-ink-muted">{error}</p>
-          <Link href="/dashboard/student" className={`${btnSecondary} mt-4`}>
-            Reintentar
-          </Link>
-        </div>
-      ) : filas.length === 0 ? (
-        <p className="mt-8 rounded-lg border border-dashed border-arena p-6 text-center text-sm text-ink-muted">
-          No tenés tareas asignadas todavía. Cuando un profesor publique una en tus materias, va a
-          aparecer acá.
-        </p>
-      ) : (
-        <ul className="mt-8 space-y-4">
-          {filas.map(({ tarea, pdfUrl }) => (
-            <TarjetaTarea key={tarea.id} tarea={tarea} pdfUrl={pdfUrl} />
-          ))}
-        </ul>
+      {materiaSeleccionada && (
+        <section aria-labelledby="tareas-heading" className="mt-10">
+          <h2 id="tareas-heading" className="font-display text-xl font-semibold text-ink">
+            Tareas del curso
+          </h2>
+          {error ? (
+            <div className="paper-shadow mt-4 rounded-lg border border-arena bg-paper-raised p-6 text-center">
+              <p className="text-sm text-ink">No se pudieron cargar tus tareas.</p>
+              <p className="mt-1 font-mono text-xs text-ink-muted">{error}</p>
+              <Link href="/dashboard/student" className={`${btnSecondary} mt-4`}>
+                Volver a mis cursos
+              </Link>
+            </div>
+          ) : filas.length === 0 ? (
+            <p className="mt-4 rounded-lg border border-dashed border-arena p-6 text-center text-sm text-ink-muted">
+              No hay tareas disponibles en este curso.
+            </p>
+          ) : (
+            <ul className="mt-4 space-y-4">
+              {filas.map(({ tarea, pdfUrl }) => (
+                <TarjetaTarea key={tarea.id} tarea={tarea} pdfUrl={pdfUrl} />
+              ))}
+            </ul>
+          )}
+        </section>
       )}
     </main>
   )

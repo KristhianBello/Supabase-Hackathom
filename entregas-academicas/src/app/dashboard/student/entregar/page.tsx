@@ -30,7 +30,7 @@ export default async function EntregarPage({
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
       <Link href="/dashboard/student" className="text-sm text-ink-muted hover:text-cacao">
-        ← Mis entregas
+        ← Volver a mis entregas
       </Link>
 
       <h1 className="mt-2 font-display text-3xl font-semibold text-ink">Subir entrega</h1>
