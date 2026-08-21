@@ -2,6 +2,12 @@
 
 import { requireRole } from '@/lib/auth'
 
+const ACCION_STYLE: Record<string, string> = {
+  INSERT: 'bg-emerald-50 text-emerald-700',
+  UPDATE: 'bg-amber-50 text-amber-700',
+  DELETE: 'bg-red-50 text-red-700',
+}
+
 export default async function AdminAuditLogsPage() {
   const { supabase } = await requireRole('admin')
 
@@ -18,38 +24,53 @@ export default async function AdminAuditLogsPage() {
     : { data: [] as { id: string; nombre_completo: string }[] }
 
   return (
-    <main className="p-8">
-      <h1 className="text-xl font-semibold">Audit logs</h1>
+    <main className="mx-auto max-w-5xl px-6 py-10">
+      <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Audit logs</h1>
+      <p className="mt-1 text-sm text-zinc-500">
+        Últimos {logs?.length ?? 0} eventos de <code>entregas</code> y <code>calificaciones</code>.
+      </p>
 
-      {error && <p className="mt-2 text-sm text-red-600">{error.message}</p>}
+      {error && (
+        <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error.message}</p>
+      )}
 
-      <div className="mt-4 overflow-x-auto">
+      <div className="mt-6 overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b">
-              <th className="py-2 pr-4">Fecha</th>
-              <th className="py-2 pr-4">Actor</th>
-              <th className="py-2 pr-4">Tabla</th>
-              <th className="py-2 pr-4">Acción</th>
-              <th className="py-2 pr-4">Registro</th>
+            <tr className="border-b border-zinc-200 text-zinc-500">
+              <th className="px-4 py-3 font-medium">Fecha</th>
+              <th className="px-4 py-3 font-medium">Actor</th>
+              <th className="px-4 py-3 font-medium">Tabla</th>
+              <th className="px-4 py-3 font-medium">Acción</th>
+              <th className="px-4 py-3 font-medium">Registro</th>
             </tr>
           </thead>
           <tbody>
             {logs?.map((log) => (
-              <tr key={log.id} className="border-b">
-                <td className="py-2 pr-4">{new Date(log.created_at).toLocaleString()}</td>
-                <td className="py-2 pr-4">
+              <tr key={log.id} className="border-b border-zinc-100 last:border-0">
+                <td className="px-4 py-3 text-zinc-600">{new Date(log.created_at).toLocaleString()}</td>
+                <td className="px-4 py-3 text-zinc-900">
                   {perfiles?.find((p) => p.id === log.actor_id)?.nombre_completo ?? log.actor_id ?? '—'}
                 </td>
-                <td className="py-2 pr-4">{log.tabla}</td>
-                <td className="py-2 pr-4">{log.accion}</td>
-                <td className="py-2 pr-4 font-mono text-xs">{log.registro_id}</td>
+                <td className="px-4 py-3 font-mono text-xs text-zinc-600">{log.tabla}</td>
+                <td className="px-4 py-3">
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                      ACCION_STYLE[log.accion] ?? 'bg-zinc-100 text-zinc-600'
+                    }`}
+                  >
+                    {log.accion}
+                  </span>
+                </td>
+                <td className="px-4 py-3 font-mono text-xs text-zinc-500">{log.registro_id}</td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        {logs?.length === 0 && <p className="mt-2 text-sm text-zinc-500">No hay eventos registrados.</p>}
+        {logs?.length === 0 && (
+          <p className="p-6 text-center text-sm text-zinc-500">No hay eventos registrados.</p>
+        )}
       </div>
     </main>
   )

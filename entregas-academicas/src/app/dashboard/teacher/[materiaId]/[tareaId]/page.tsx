@@ -1,5 +1,6 @@
 // Persona 3 — entregas de una tarea: descarga de PDF + calificar.
 
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth'
 import { calificar } from './actions'
@@ -14,7 +15,7 @@ export default async function TareaEntregasPage({
 
   const { data: tarea } = await supabase
     .from('tareas')
-    .select('id, titulo, fecha_limite')
+    .select('id, titulo, fecha_limite, materia_id, materias(nombre)')
     .eq('id', tareaId)
     .single()
 
@@ -62,30 +63,55 @@ export default async function TareaEntregasPage({
   )
 
   return (
-    <main className="p-8">
-      <h1 className="text-xl font-semibold">{tarea.titulo}</h1>
-      <p className="text-sm text-zinc-500">
+    <main className="mx-auto max-w-4xl px-6 py-10">
+      <Link
+        href={`/dashboard/teacher/${materiaId}`}
+        className="text-sm text-zinc-500 hover:text-zinc-700"
+      >
+        ← {tarea.materias?.nombre ?? 'Materia'}
+      </Link>
+
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900">{tarea.titulo}</h1>
+      <p className="mt-1 text-sm text-zinc-500">
         Fecha límite: {new Date(tarea.fecha_limite).toLocaleString()}
       </p>
 
       <ul className="mt-6 space-y-4">
         {filas.map((entrega) => (
-          <li key={entrega.id} className="rounded border p-4">
-            <p className="font-medium">{entrega.nombreEstudiante}</p>
-            <p className="text-sm text-zinc-500">
-              {entrega.archivo_nombre} · entregado el{' '}
-              {new Date(entrega.entregada_at).toLocaleString()}
-            </p>
+          <li key={entrega.id} className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="font-medium text-zinc-900">{entrega.nombreEstudiante}</p>
+                <p className="text-sm text-zinc-500">
+                  {entrega.archivo_nombre} · entregado el{' '}
+                  {new Date(entrega.entregada_at).toLocaleString()}
+                </p>
+              </div>
+
+              <span
+                className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
+                  entrega.nota != null
+                    ? 'bg-emerald-50 text-emerald-700'
+                    : 'bg-amber-50 text-amber-700'
+                }`}
+              >
+                {entrega.nota != null ? `Calificada: ${entrega.nota}` : 'Sin calificar'}
+              </span>
+            </div>
 
             {entrega.pdfUrl ? (
-              <a href={entrega.pdfUrl} target="_blank" className="text-sm text-blue-600 underline">
+              <a
+                href={entrega.pdfUrl}
+                target="_blank"
+                className="mt-2 inline-block text-sm text-blue-600 underline"
+              >
                 Descargar PDF
               </a>
             ) : (
-              <p className="text-sm text-red-600">No se pudo generar el enlace de descarga.</p>
+              <p className="mt-2 text-sm text-red-600">No se pudo generar el enlace de descarga.</p>
             )}
 
-            <form action={calificar} className="mt-2 flex flex-wrap items-center gap-2">
+            <form action={calificar} className="mt-3 flex flex-wrap items-center gap-2">
               <input type="hidden" name="entrega_id" value={entrega.id} />
               <input type="hidden" name="materia_id" value={materiaId} />
               <input type="hidden" name="tarea_id" value={tareaId} />
@@ -96,7 +122,7 @@ export default async function TareaEntregasPage({
                 min={0}
                 max={100}
                 defaultValue={entrega.nota ?? ''}
-                className="w-24 rounded border px-2 py-1"
+                className="w-24 rounded-md border border-zinc-300 px-2 py-1.5 text-sm"
                 required
               />
               <input
@@ -104,9 +130,12 @@ export default async function TareaEntregasPage({
                 name="comentario"
                 placeholder="Comentario (opcional)"
                 defaultValue={entrega.comentario}
-                className="min-w-48 flex-1 rounded border px-2 py-1"
+                className="min-w-48 flex-1 rounded-md border border-zinc-300 px-2 py-1.5 text-sm"
               />
-              <button type="submit" className="rounded bg-black px-3 py-1 text-white">
+              <button
+                type="submit"
+                className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800"
+              >
                 Guardar nota
               </button>
             </form>
@@ -114,7 +143,9 @@ export default async function TareaEntregasPage({
         ))}
 
         {filas.length === 0 && (
-          <p className="text-sm text-zinc-500">Todavía no hay entregas.</p>
+          <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500">
+            Todavía no hay entregas.
+          </p>
         )}
       </ul>
     </main>
