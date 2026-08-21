@@ -1,16 +1,7 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-
-export type CrearTareaState = {
-  error?: string
-  success?: string
-}
-
-const INITIAL_STATE: CrearTareaState = {}
-
-export { INITIAL_STATE }
+import type { CrearTareaState } from './types'
 
 function texto(formData: FormData, campo: string) {
   return String(formData.get(campo) ?? '').trim()
@@ -78,8 +69,6 @@ export async function crearTarea(
       return { error: `No se pudo crear la tarea: ${error.message}` }
     }
 
-    revalidatePath(`/dashboard/teacher/${materiaId}`)
-    revalidatePath('/dashboard/teacher')
     return { success: 'La tarea se asignó a los estudiantes inscritos.' }
   } catch (error) {
     console.error('crearTarea: error inesperado', error)

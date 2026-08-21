@@ -1,9 +1,13 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { useFormStatus } from 'react-dom'
+import { useRouter } from 'next/navigation'
 import { VoiceAgent } from '@/components/VoiceAgent'
-import { crearTarea, INITIAL_STATE } from './actions'
+import { crearTarea } from './actions'
+import type { CrearTareaState } from './types'
+
+const INITIAL_STATE: CrearTareaState = {}
 
 function BotonGuardar() {
   const { pending } = useFormStatus()
@@ -21,9 +25,14 @@ function BotonGuardar() {
 
 export function CrearTareaForm({ materiaId }: { materiaId: string }) {
   const [state, formAction] = useActionState(crearTarea, INITIAL_STATE)
+  const router = useRouter()
   const [titulo, setTitulo] = useState('')
   const [descripcion, setDescripcion] = useState('')
   const [fechaLimite, setFechaLimite] = useState('')
+
+  useEffect(() => {
+    if (state.success) router.refresh()
+  }, [router, state.success])
 
   return (
     <details className="paper-shadow mt-8 rounded-lg border border-arena border-l-[5px] border-l-cacao bg-paper-raised">
