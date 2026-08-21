@@ -1,11 +1,12 @@
 // Persona 3 — audit_logs completos, solo visibles para admin (RLS: audit_logs_select_admin).
 
 import { requireRole } from '@/lib/auth'
+import { Stamp } from '@/components/Stamp'
 
-const ACCION_STYLE: Record<string, string> = {
-  INSERT: 'bg-emerald-50 text-emerald-700',
-  UPDATE: 'bg-amber-50 text-amber-700',
-  DELETE: 'bg-red-50 text-red-700',
+const ACCION_TONE: Record<string, 'musgo' | 'toquilla' | 'brick'> = {
+  INSERT: 'musgo',
+  UPDATE: 'toquilla',
+  DELETE: 'brick',
 }
 
 export default async function AdminAuditLogsPage() {
@@ -25,51 +26,53 @@ export default async function AdminAuditLogsPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Audit logs</h1>
-      <p className="mt-1 text-sm text-zinc-500">
-        Últimos {logs?.length ?? 0} eventos de <code>entregas</code> y <code>calificaciones</code>.
+      <p className="font-mono text-[11px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
+        Libro de auditoría
+      </p>
+      <h1 className="mt-1 font-display text-2xl font-semibold text-ink">Audit logs</h1>
+      <p className="mt-1 text-sm text-ink-muted">
+        Últimos {logs?.length ?? 0} eventos de <code className="font-mono">entregas</code> y{' '}
+        <code className="font-mono">calificaciones</code>.
       </p>
 
       {error && (
-        <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error.message}</p>
+        <p className="mt-4 rounded-md border border-brick/30 bg-brick-soft px-3 py-2 text-sm text-brick">
+          {error.message}
+        </p>
       )}
 
-      <div className="mt-6 overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm">
+      <div className="mt-6 overflow-x-auto rounded-lg border border-arena bg-paper-raised shadow-sm">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-zinc-200 text-zinc-500">
-              <th className="px-4 py-3 font-medium">Fecha</th>
-              <th className="px-4 py-3 font-medium">Actor</th>
-              <th className="px-4 py-3 font-medium">Tabla</th>
-              <th className="px-4 py-3 font-medium">Acción</th>
-              <th className="px-4 py-3 font-medium">Registro</th>
+            <tr className="border-b border-arena text-ink-muted">
+              <th className="px-4 py-3 font-mono text-xs font-semibold tracking-wide uppercase">Fecha</th>
+              <th className="px-4 py-3 font-mono text-xs font-semibold tracking-wide uppercase">Actor</th>
+              <th className="px-4 py-3 font-mono text-xs font-semibold tracking-wide uppercase">Tabla</th>
+              <th className="px-4 py-3 font-mono text-xs font-semibold tracking-wide uppercase">Acción</th>
+              <th className="px-4 py-3 font-mono text-xs font-semibold tracking-wide uppercase">Registro</th>
             </tr>
           </thead>
           <tbody>
             {logs?.map((log) => (
-              <tr key={log.id} className="border-b border-zinc-100 last:border-0">
-                <td className="px-4 py-3 text-zinc-600">{new Date(log.created_at).toLocaleString()}</td>
-                <td className="px-4 py-3 text-zinc-900">
+              <tr key={log.id} className="border-b border-arena-soft last:border-0">
+                <td className="px-4 py-3 font-mono text-xs text-ink-muted">
+                  {new Date(log.created_at).toLocaleString()}
+                </td>
+                <td className="px-4 py-3 text-ink">
                   {perfiles?.find((p) => p.id === log.actor_id)?.nombre_completo ?? log.actor_id ?? '—'}
                 </td>
-                <td className="px-4 py-3 font-mono text-xs text-zinc-600">{log.tabla}</td>
+                <td className="px-4 py-3 font-mono text-xs text-ink-muted">{log.tabla}</td>
                 <td className="px-4 py-3">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                      ACCION_STYLE[log.accion] ?? 'bg-zinc-100 text-zinc-600'
-                    }`}
-                  >
-                    {log.accion}
-                  </span>
+                  <Stamp tone={ACCION_TONE[log.accion] ?? 'ink'}>{log.accion}</Stamp>
                 </td>
-                <td className="px-4 py-3 font-mono text-xs text-zinc-500">{log.registro_id}</td>
+                <td className="px-4 py-3 font-mono text-xs text-ink-muted">{log.registro_id}</td>
               </tr>
             ))}
           </tbody>
         </table>
 
         {logs?.length === 0 && (
-          <p className="p-6 text-center text-sm text-zinc-500">No hay eventos registrados.</p>
+          <p className="p-6 text-center text-sm text-ink-muted">No hay eventos registrados.</p>
         )}
       </div>
     </main>

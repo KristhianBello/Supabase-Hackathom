@@ -1,10 +1,17 @@
 import { createClient } from '@/lib/supabase/server'
+import { Stamp } from '@/components/Stamp'
 import { logout } from './actions'
 
 const ROL_LABEL: Record<string, string> = {
   estudiante: 'Estudiante',
   profesor: 'Profesor',
   admin: 'Admin',
+}
+
+const ROL_TONE: Record<string, 'pacifico' | 'toquilla' | 'ink'> = {
+  estudiante: 'pacifico',
+  profesor: 'toquilla',
+  admin: 'ink',
 }
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -19,26 +26,29 @@ export default async function DashboardLayout({ children }: { children: React.Re
     : { data: null }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="flex items-center justify-between border-b border-zinc-200 bg-white px-6 py-3">
-        <span className="text-sm font-semibold tracking-tight text-zinc-900">
-          Entregas Académicas
-        </span>
+    <div className="min-h-screen bg-paper">
+      <header className="flex items-center justify-between border-b border-arena bg-paper-raised px-6 py-3">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full border-[1.5px] border-cacao font-display text-xs font-semibold text-cacao">
+            EA
+          </span>
+          <span className="font-display text-sm font-semibold tracking-tight text-ink">
+            Entregas Académicas
+          </span>
+        </div>
 
         <div className="flex items-center gap-4">
           {profile && (
-            <div className="flex items-center gap-2 text-sm text-zinc-600">
-              <span>{profile.nombre_completo}</span>
-              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700">
-                {ROL_LABEL[profile.rol] ?? profile.rol}
-              </span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-ink-muted">{profile.nombre_completo}</span>
+              <Stamp tone={ROL_TONE[profile.rol] ?? 'ink'}>{ROL_LABEL[profile.rol] ?? profile.rol}</Stamp>
             </div>
           )}
 
           <form action={logout}>
             <button
               type="submit"
-              className="rounded-md border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100"
+              className="rounded-md border border-arena px-3 py-1.5 text-sm font-medium text-ink-muted transition-colors hover:border-cacao hover:text-cacao"
             >
               Cerrar sesión
             </button>

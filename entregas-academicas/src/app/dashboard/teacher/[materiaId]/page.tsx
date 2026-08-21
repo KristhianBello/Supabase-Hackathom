@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth'
+import { Stamp } from '@/components/Stamp'
 
 export default async function MateriaTareasPage({
   params,
@@ -28,12 +29,12 @@ export default async function MateriaTareasPage({
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-10">
-      <Link href="/dashboard/teacher" className="text-sm text-zinc-500 hover:text-zinc-700">
+      <Link href="/dashboard/teacher" className="text-sm text-ink-muted hover:text-cacao">
         ← Mis materias
       </Link>
 
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900">{materia.nombre}</h1>
-      <p className="mt-1 text-sm text-zinc-500">Tareas de esta materia.</p>
+      <h1 className="mt-2 font-display text-2xl font-semibold text-ink">{materia.nombre}</h1>
+      <p className="mt-1 text-sm text-ink-muted">Tareas de esta materia.</p>
 
       <ul className="mt-6 space-y-3">
         {tareas?.map((tarea) => {
@@ -42,18 +43,12 @@ export default async function MateriaTareasPage({
             <li key={tarea.id}>
               <Link
                 href={`/dashboard/teacher/${materiaId}/${tarea.id}`}
-                className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+                className="flex items-center justify-between rounded-lg border border-arena border-l-[5px] border-l-cacao bg-paper-raised p-5 shadow-sm transition-shadow hover:shadow-md"
               >
-                <span className="font-medium text-zinc-900">{tarea.titulo}</span>
-                <span className="flex items-center gap-2 text-sm text-zinc-500">
-                  {new Date(tarea.fecha_limite).toLocaleString()}
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                      vencida ? 'bg-zinc-100 text-zinc-600' : 'bg-emerald-50 text-emerald-700'
-                    }`}
-                  >
-                    {vencida ? 'Cerrada' : 'Abierta'}
-                  </span>
+                <span className="font-display font-medium text-ink">{tarea.titulo}</span>
+                <span className="flex items-center gap-3 text-sm text-ink-muted">
+                  <span className="font-mono text-xs">{new Date(tarea.fecha_limite).toLocaleString()}</span>
+                  <Stamp tone={vencida ? 'ink' : 'musgo'}>{vencida ? 'Cerrada' : 'Abierta'}</Stamp>
                 </span>
               </Link>
             </li>
@@ -62,7 +57,7 @@ export default async function MateriaTareasPage({
       </ul>
 
       {tareas?.length === 0 && (
-        <p className="mt-6 rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500">
+        <p className="mt-6 rounded-lg border border-dashed border-arena p-6 text-center text-sm text-ink-muted">
           Esta materia todavía no tiene tareas.
         </p>
       )}

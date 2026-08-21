@@ -14,11 +14,16 @@ export default async function TeacherDashboardPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-10">
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Mis materias</h1>
-      <p className="mt-1 text-sm text-zinc-500">Elegí una materia para ver sus tareas y entregas.</p>
+      <p className="font-mono text-[11px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
+        Libro de materias
+      </p>
+      <h1 className="mt-1 font-display text-2xl font-semibold text-ink">Mis materias</h1>
+      <p className="mt-1 text-sm text-ink-muted">Elegí una materia para ver sus tareas y entregas.</p>
 
       {error && (
-        <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error.message}</p>
+        <p className="mt-4 rounded-md border border-brick/30 bg-brick-soft px-3 py-2 text-sm text-brick">
+          {error.message}
+        </p>
       )}
 
       <ul className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -26,11 +31,11 @@ export default async function TeacherDashboardPage() {
           <li key={materia.id}>
             <Link
               href={`/dashboard/teacher/${materia.id}`}
-              className="block rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+              className="block rounded-lg border border-arena border-l-[5px] border-l-cacao bg-paper-raised p-5 shadow-sm transition-shadow hover:shadow-md"
             >
-              <p className="font-medium text-zinc-900">{materia.nombre}</p>
+              <p className="font-display font-medium text-ink">{materia.nombre}</p>
               {materia.descripcion && (
-                <p className="mt-1 text-sm text-zinc-500">{materia.descripcion}</p>
+                <p className="mt-1 text-sm text-ink-muted">{materia.descripcion}</p>
               )}
             </Link>
           </li>
@@ -38,7 +43,7 @@ export default async function TeacherDashboardPage() {
       </ul>
 
       {materias?.length === 0 && (
-        <p className="mt-6 rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500">
+        <p className="mt-6 rounded-lg border border-dashed border-arena p-6 text-center text-sm text-ink-muted">
           No tenés materias asignadas todavía.
         </p>
       )}
