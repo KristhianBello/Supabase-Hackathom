@@ -46,17 +46,22 @@ npm run check:supabase
 La aplicación también expone `GET /api/health`. Una conexión correcta devuelve
 HTTP `200` con `status: "ok"`; el endpoint no expone claves ni datos académicos.
 
-## Preparar usuarios
+## Usuarios de demostración
 
-Crea los usuarios desde Supabase Auth. Cada usuario nuevo empieza como
-`estudiante`. Para preparar el primer administrador o un profesor, cambia su
-rol desde el SQL Editor o una operación administrativa confiable:
+Los ocho perfiles ficticios se definen en `scripts/demo-users.mjs`. Para
+crearlos o actualizarlos con Supabase Auth, configura `SUPABASE_SECRET_KEY` y
+`DEMO_USER_PASSWORD` únicamente en `.env.local` y ejecuta:
 
-```sql
-update public.profiles
-set rol = 'admin'
-where id = '<uuid-del-usuario>';
+```bash
+npm run seed:demo-users
 ```
 
-Nunca expongas una clave secreta o `service_role` en variables
-`NEXT_PUBLIC_*`.
+Después de aplicar `supabase/seed.sql`, comprueba todos los accesos y sus roles:
+
+```bash
+npm run check:demo-logins
+```
+
+Estos usuarios y datos son solo para desarrollo o demostraciones. Nunca
+expongas una clave secreta o `service_role` en variables `NEXT_PUBLIC_*`, ni
+uses estas credenciales en producción.

@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "check:supabase": "node --env-file=.env.local scripts/check-supabase.mjs",
+    "check:demo-logins": "node --env-file=.env.local scripts/check-demo-logins.mjs",
+    "seed:demo-users": "node --env-file=.env.local scripts/seed-demo-users.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
