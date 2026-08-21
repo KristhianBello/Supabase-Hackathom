@@ -3,6 +3,12 @@
 import { login } from './actions'
 import { HandWrittenTitle } from '@/components/ui/hand-writing-text'
 
+const CUENTAS_JURADO = [
+  { rol: 'Administrador', email: 'maria.zambrano@demo.manabi.edu.ec' },
+  { rol: 'Docente', email: 'jose.cedeno@demo.manabi.edu.ec' },
+  { rol: 'Estudiante', email: 'carlos.mendoza@demo.manabi.edu.ec' },
+] as const
+
 export default async function LoginPage({
   searchParams,
 }: {
@@ -10,6 +16,7 @@ export default async function LoginPage({
 }) {
   const { error } = await searchParams
   const folio = new Date().toLocaleDateString('es-EC', { year: 'numeric', month: '2-digit', day: '2-digit' })
+  const demoPassword = process.env.DEMO_USER_PASSWORD
 
   return (
     <main className="relative flex min-h-screen items-center overflow-hidden px-6 py-16 lg:px-16">
@@ -101,6 +108,34 @@ export default async function LoginPage({
           >
             Entrar
           </button>
+
+          <aside className="mt-6 rounded-md border border-dashed border-toquilla/70 bg-toquilla-soft/40 p-4">
+            <p className="font-mono text-[11px] font-semibold tracking-[0.14em] text-cacao-dark uppercase">
+              Accesos para jurados
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+              Cuentas ficticias exclusivas para la demostración de la hackatón.
+            </p>
+
+            <dl className="mt-3 space-y-2 text-sm">
+              {CUENTAS_JURADO.map((cuenta) => (
+                <div key={cuenta.email} className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+                  <dt className="font-medium text-ink">{cuenta.rol}</dt>
+                  <dd className="font-mono text-xs text-ink-muted">{cuenta.email}</dd>
+                </div>
+              ))}
+            </dl>
+
+            {demoPassword ? (
+              <p className="mt-3 border-t border-toquilla/50 pt-3 text-sm text-ink">
+                Contraseña: <code className="rounded bg-paper px-1.5 py-0.5 font-mono text-xs">{demoPassword}</code>
+              </p>
+            ) : (
+              <p className="mt-3 border-t border-toquilla/50 pt-3 text-xs text-brick">
+                Configurá DEMO_USER_PASSWORD para habilitar los accesos de demostración.
+              </p>
+            )}
+          </aside>
         </form>
       </div>
     </main>
