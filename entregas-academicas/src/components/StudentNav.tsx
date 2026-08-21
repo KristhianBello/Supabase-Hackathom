@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { motion } from 'framer-motion'
 
 export function StudentNav() {
   const pathname = usePathname()
@@ -20,19 +21,33 @@ export function StudentNav() {
         <Link
           href="/dashboard/student/personal"
           aria-current={enAreaPersonal ? 'page' : undefined}
-          className={`flex min-h-12 items-center px-3 text-sm transition-colors ${
-            enAreaPersonal ? 'bg-cacao text-paper-raised' : 'text-ink-muted hover:bg-arena-soft hover:text-ink'
+          className={`relative flex min-h-12 items-center px-3 text-sm transition-colors ${
+            enAreaPersonal ? 'text-paper-raised' : 'text-ink-muted hover:bg-arena-soft hover:text-ink'
           }`}
         >
+          {enAreaPersonal && (
+            <motion.span
+              layoutId="student-nav-active"
+              className="absolute inset-0 -z-10 bg-cacao"
+              transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+            />
+          )}
           Área personal
         </Link>
         <Link
           href="/dashboard/student#materias"
           aria-current={enDashboard ? 'page' : undefined}
           className={`relative flex min-h-12 items-center px-3 text-sm font-medium transition-colors duration-150 ${
-            enDashboard ? 'bg-cacao text-paper-raised' : 'text-ink-muted hover:bg-arena-soft hover:text-ink'
+            enDashboard ? 'text-paper-raised' : 'text-ink-muted hover:bg-arena-soft hover:text-ink'
           }`}
         >
+          {enDashboard && (
+            <motion.span
+              layoutId="student-nav-active"
+              className="absolute inset-0 -z-10 bg-cacao"
+              transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+            />
+          )}
           Mis cursos
         </Link>
       </div>
