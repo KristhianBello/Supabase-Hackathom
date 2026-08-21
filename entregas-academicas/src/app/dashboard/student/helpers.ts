@@ -100,6 +100,10 @@ export function fechaCompleta(iso: string): string {
   return fmtCompleta.format(new Date(iso))
 }
 
+export function venceProximo(iso: string, ahora = new Date()): boolean {
+  return new Date(iso).getTime() - ahora.getTime() < 24 * 60 * 60 * 1000
+}
+
 export function plazoRelativo(iso: string, ahora = new Date()): string {
   const ms = new Date(iso).getTime() - ahora.getTime()
   const abs = Math.abs(ms)
