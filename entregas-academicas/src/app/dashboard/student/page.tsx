@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { requireRole } from '@/lib/auth'
 import { Stamp } from '@/components/Stamp'
 import { ClockIcon, DownloadIcon } from '@/components/icons'
+import { StudentVoiceAssistant } from './StudentVoiceAssistant'
+import { PendingDrafts, type DraftVM } from './PendingDrafts'
 import {
   btnGhost,
   btnPrimary,
@@ -135,7 +137,7 @@ export default async function StudentDashboardPage({
   searchParams: Promise<{ materia?: string }>
 }) {
   const { materia: materiaParam } = await searchParams
-  const { supabase } = await requireRole('estudiante')
+  const { supabase, user } = await requireRole('estudiante')
   const { tareas, error } = await fetchTareas(supabase)
   const { data: materiasData } = await supabase
     .from('materias')
@@ -143,6 +145,18 @@ export default async function StudentDashboardPage({
     .order('nombre')
 
   const materias = (materiasData ?? []).map((materia) => materia.nombre)
+  const { data: draftFiles, error: draftsError } = await supabase.storage
+    .from('borradores-alumnos')
+    .list(user.id, { sortBy: { column: 'updated_at', order: 'desc' } })
+
+  const drafts: DraftVM[] = (draftFiles ?? [])
+    .filter((file) => file.name && file.name !== '.emptyFolderPlaceholder')
+    .map((file) => ({
+      path: `${user.id}/${file.name}`,
+      name: file.name,
+      size: typeof file.metadata?.size === 'number' ? file.metadata.size : null,
+      updatedAt: file.updated_at ?? null,
+    }))
   const materiaSeleccionada = materiaParam && materias.includes(materiaParam) ? materiaParam : null
   const tareasFiltradas = materiaSeleccionada
     ? (tareas ?? []).filter((tarea) => tarea.materia === materiaSeleccionada)
@@ -173,6 +187,10 @@ export default async function StudentDashboardPage({
           <p className="mt-1.5 text-sm text-ink-muted tabular-nums">{resumen(tareasFiltradas)}</p>
         )}
       </section>
+
+      <StudentVoiceAssistant drafts={drafts} />
+
+      <PendingDrafts drafts={drafts} loadError={draftsError?.message ?? null} />
 
       {materias.length > 0 && (
         <section id="materias" aria-labelledby="materias-heading" className="mt-8">

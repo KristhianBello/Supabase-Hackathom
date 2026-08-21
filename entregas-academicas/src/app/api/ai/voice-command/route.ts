@@ -16,12 +16,22 @@ const responseSchema = {
       enum: ['seleccionar_tarea', 'rellenar_tarea', 'ninguna'],
     },
     tareaId: { type: ['string', 'null'] },
+    borradorNombre: { type: ['string', 'null'] },
     materiaId: { type: ['string', 'null'] },
     titulo: { type: ['string', 'null'] },
     descripcion: { type: ['string', 'null'] },
     fechaLimite: { type: ['string', 'null'] },
   },
-  required: ['reply', 'action', 'tareaId', 'materiaId', 'titulo', 'descripcion', 'fechaLimite'],
+  required: [
+    'reply',
+    'action',
+    'tareaId',
+    'borradorNombre',
+    'materiaId',
+    'titulo',
+    'descripcion',
+    'fechaLimite',
+  ],
 } as const
 
 function text(value: unknown) {
@@ -48,6 +58,7 @@ function parseResult(value: unknown): VoiceCommandResult | null {
     reply,
     action: action as VoiceAction,
     tareaId: text(candidate.tareaId),
+    borradorNombre: text(candidate.borradorNombre),
     materiaId: text(candidate.materiaId),
     titulo: text(candidate.titulo),
     descripcion: text(candidate.descripcion),
@@ -82,6 +93,7 @@ function withoutAction(reply: string): VoiceCommandResult {
     reply,
     action: 'ninguna',
     tareaId: null,
+    borradorNombre: null,
     materiaId: null,
     titulo: null,
     descripcion: null,
@@ -134,10 +146,18 @@ export async function POST(request: Request) {
       materia: tarea.materias?.nombre ?? 'Materia',
     }))
 
+    const { data: draftFiles } = await supabase.storage
+      .from('borradores-alumnos')
+      .list(user.id, { sortBy: { column: 'updated_at', order: 'desc' } })
+
+    const borradores = (draftFiles ?? [])
+      .filter((file) => file.name && file.name !== '.emptyFolderPlaceholder')
+      .map((file) => file.name)
+
     const result = await askAI({
       command,
       role: 'estudiante',
-      context: permitidas,
+      context: { tareasDisponibles: permitidas, borradoresPendientes: borradores },
     })
 
     if (!result) {
@@ -146,6 +166,10 @@ export async function POST(request: Request) {
 
     if (result.action === 'seleccionar_tarea' && !permitidas.some((tarea) => tarea.id === result.tareaId)) {
       return NextResponse.json(withoutAction('No pude identificar una tarea disponible. Decime el nombre de la materia o tarea.'))
+    }
+
+    if (result.borradorNombre && !borradores.includes(result.borradorNombre)) {
+      return NextResponse.json(withoutAction('No pude identificar el PDF pendiente. Decime el nombre del archivo.'))
     }
 
     return NextResponse.json(result)
@@ -206,7 +230,7 @@ async function askAI({
 
   const instructions =
     role === 'estudiante'
-      ? 'Sos el asistente académico por voz de un estudiante. Elegí una tarea únicamente si coincide de forma clara con una de las tareas disponibles. Nunca inventes IDs ni afirmes que subiste un archivo: solo podés seleccionar una tarea para que el estudiante confirme la subida. Respondé en español ecuatoriano, de forma breve.'
+      ? 'Sos el asistente académico por voz de un estudiante. Elegí una tarea únicamente si coincide de forma clara con una de las tareas disponibles. Los borradores pendientes son nombres de PDFs que el estudiante ya guardó en su espacio personal; podés mencionarlos y usarlos para inferir la tarea. Si identificás uno, devolvé su nombre exacto en borradorNombre; si no, devolvé null. Nunca inventes IDs ni afirmes que subiste un archivo. Solo podés seleccionar una tarea para que el estudiante confirme la subida. Respondé en español ecuatoriano, de forma breve.'
       : 'Sos el asistente académico por voz de un docente. Podés preparar un borrador de tarea únicamente para una materia incluida en la lista. Nunca inventes IDs ni publiques la tarea: solo completás el formulario para que el docente la revise y confirme. Convertí fechas relativas a formato YYYY-MM-DDTHH:mm en hora de Ecuador continental; si no hay fecha clara, no propongas la acción. Respondé en español ecuatoriano, de forma breve.'
 
   const openAIResponse = await fetch(`${apiBase}/responses`, {

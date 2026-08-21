@@ -4,6 +4,7 @@ export type VoiceCommandResult = {
   reply: string
   action: VoiceAction
   tareaId: string | null
+  borradorNombre: string | null
   materiaId: string | null
   titulo: string | null
   descripcion: string | null

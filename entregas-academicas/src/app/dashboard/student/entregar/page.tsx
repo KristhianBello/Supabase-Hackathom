@@ -12,10 +12,10 @@ import { EntregarForm } from './form'
 export default async function EntregarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tarea?: string }>
+  searchParams: Promise<{ tarea?: string; borrador?: string }>
 }) {
-  const { tarea: tareaParam } = await searchParams
-  const { supabase } = await requireRole('estudiante')
+  const { tarea: tareaParam, borrador: borradorParam } = await searchParams
+  const { supabase, user } = await requireRole('estudiante')
   const { tareas, error } = await fetchTareas(supabase)
 
   // Entregable = dentro de plazo y (sin entrega o entrega aún sin calificar).
@@ -26,6 +26,14 @@ export default async function EntregarPage({
 
   const preseleccionId =
     entregables.find((t) => t.id === tareaParam)?.id ?? entregables[0]?.id ?? ''
+
+  const borradorPartes = borradorParam?.split('/') ?? []
+  const borrador =
+    borradorPartes.length === 2 &&
+    borradorPartes[0] === user.id &&
+    borradorPartes[1].toLowerCase().endsWith('.pdf')
+      ? { path: borradorParam!, nombre: borradorPartes[1] }
+      : null
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
@@ -57,7 +65,7 @@ export default async function EntregarPage({
           </Link>
         </div>
       ) : (
-        <EntregarForm tareas={entregables} preseleccionId={preseleccionId} />
+        <EntregarForm tareas={entregables} preseleccionId={preseleccionId} borrador={borrador} />
       )}
     </main>
   )
