@@ -10,6 +10,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { VoiceAgent } from '@/components/VoiceAgent'
 import {
   btnPrimary,
   fechaCompleta,
@@ -165,6 +166,16 @@ export function EntregarForm({
           hacerlo antes de que sea calificada.
         </p>
       )}
+
+      <VoiceAgent
+        hint="Decí, por ejemplo: “quiero entregar el informe de Programación Web”."
+        onResult={(result) => {
+          if (result.action === 'seleccionar_tarea' && result.tareaId) {
+            setTareaId(result.tareaId)
+            setError(null)
+          }
+        }}
+      />
 
       <div className="space-y-1.5">
         <label htmlFor="archivo" className="block text-xs font-medium text-ink-muted">

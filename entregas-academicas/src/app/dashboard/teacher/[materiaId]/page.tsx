@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth'
 import { Stamp } from '@/components/Stamp'
 import { ClockIcon } from '@/components/icons'
+import { CrearTareaForm } from './crear-tarea-form'
 
 export default async function MateriaTareasPage({
   params,
@@ -36,8 +37,10 @@ export default async function MateriaTareasPage({
 
       <h1 className="mt-2 font-display text-3xl font-semibold text-ink">{materia.nombre}</h1>
       <p className="mt-1.5 text-sm text-ink-muted">
-        Tareas ordenadas por fecha límite, como asientos en un libro.
+        Las tareas que crees aquí quedan asignadas a esta materia y a sus estudiantes inscritos.
       </p>
+
+      <CrearTareaForm materiaId={materiaId} />
 
       {/* Orden cronológica real (fecha_limite) — la línea de tiempo encierra
           esa información, no la decora. */}

@@ -70,3 +70,22 @@ requiere una clave secreta.
 Estos usuarios y datos son solo para desarrollo o demostraciones. Nunca
 expongas una clave secreta o `service_role` en variables `NEXT_PUBLIC_*`, ni
 uses estas credenciales en producción.
+
+## Operación con datos reales
+
+Los datos de `supabase/seed.sql` son únicamente de demostración. En una
+instalación real, el administrador asigna cada materia a un perfil con rol
+`profesor` e inscribe a los estudiantes correspondientes. Después, el profesor
+entra en esa materia y usa **Nueva tarea para esta materia**: la tarea se guarda
+en Supabase y solo aparece para los estudiantes inscritos, sin depender de
+datos ficticios.
+
+Para habilitar las funciones de IA, agrega en tu `.env.local` las variables
+`OPENAI_API_KEY`, `AI_MODEL=gpt-5.6-terra` y `AI_REASONING_EFFORT=low`. Estas
+variables son solo de servidor; nunca deben llevar el prefijo `NEXT_PUBLIC_`.
+
+El asistente de voz escucha desde el navegador, envía únicamente la
+transcripción al servidor y responde con una propuesta: en estudiantes elige
+una tarea disponible para la subida; en docentes completa el borrador de una
+tarea. La acción final siempre la confirma el usuario con el botón de subir o
+asignar.
