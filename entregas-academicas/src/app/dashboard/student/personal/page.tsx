@@ -3,6 +3,8 @@ import { requireRole } from '@/lib/auth'
 import { FadeUp } from '@/components/motion/fade-up'
 import { AnimatedNumber } from '@/components/motion/animated-number'
 import { estadoTarea, fetchTareas, type TareaVM } from '../helpers'
+import { PendingDrafts, type DraftVM } from '../PendingDrafts'
+import { StudentVoiceAssistant } from '../StudentVoiceAssistant'
 import { NextTasks } from './next-tasks'
 
 function contar(tareas: TareaVM[], estados: string[]) {
@@ -10,8 +12,22 @@ function contar(tareas: TareaVM[], estados: string[]) {
 }
 
 export default async function StudentPersonalPage() {
-  const { supabase } = await requireRole('estudiante')
-  const { tareas, error } = await fetchTareas(supabase)
+  const { supabase, user } = await requireRole('estudiante')
+  const [{ tareas, error }, { data: draftFiles, error: draftsError }] = await Promise.all([
+    fetchTareas(supabase),
+    supabase.storage
+      .from('borradores-alumnos')
+      .list(user.id, { sortBy: { column: 'updated_at', order: 'desc' } }),
+  ])
+
+  const drafts: DraftVM[] = (draftFiles ?? [])
+    .filter((file) => file.name && file.name !== '.emptyFolderPlaceholder')
+    .map((file) => ({
+      path: `${user.id}/${file.name}`,
+      name: file.name,
+      size: typeof file.metadata?.size === 'number' ? file.metadata.size : null,
+      updatedAt: file.updated_at ?? null,
+    }))
   const lista = tareas ?? []
   const pendientes = contar(lista, ['pendiente', 'vencida'])
   const entregadas = contar(lista, ['entregada', 'cerrada'])
@@ -27,6 +43,10 @@ export default async function StudentPersonalPage() {
         <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Resumen de actividad</h1>
         <p className="mt-1.5 text-sm text-ink-muted">Tu progreso y las tareas que requieren atención.</p>
       </FadeUp>
+
+      <StudentVoiceAssistant drafts={drafts} />
+
+      <PendingDrafts drafts={drafts} loadError={draftsError?.message ?? null} />
 
       {error ? (
         <p className="mt-8 rounded-md border border-brick/30 bg-brick-soft px-3 py-2 text-sm text-brick">
